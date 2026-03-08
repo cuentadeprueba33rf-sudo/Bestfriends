@@ -166,6 +166,7 @@ export default function App() {
   };
 
   const setPassword = () => {
+    if (isLocked) return;
     if (newPassInput.trim()) {
       localStorage.setItem('eternity_vault_pass', newPassInput);
       setVaultPassword(newPassInput);
@@ -175,6 +176,7 @@ export default function App() {
   };
 
   const removePassword = () => {
+    if (isLocked) return;
     localStorage.removeItem('eternity_vault_pass');
     setVaultPassword(null);
     setIsLocked(false);
@@ -191,6 +193,7 @@ export default function App() {
   };
 
   const resetExperience = () => {
+    if (isLocked) return;
     if (confirm('¿Quieres volver a ver la Galería desde el principio? Tus momentos guardados NO se borrarán.')) {
       localStorage.removeItem('eternity_chapter');
       setChapter(0);
@@ -521,19 +524,26 @@ export default function App() {
                 <p className="text-[10px] uppercase tracking-[0.3em] text-charcoal/40">Galería Privada</p>
               </div>
               <div className="flex gap-4">
-                <button 
-                  onClick={() => setIsSettingsOpen(true)}
-                  className="p-3 rounded-full hover:bg-charcoal/5 transition-colors text-charcoal/40 hover:text-charcoal"
-                >
-                  <Settings size={20} />
-                </button>
-                {vaultPassword && (
-                  <button 
-                    onClick={() => setIsLocked(true)}
-                    className="p-3 rounded-full hover:bg-charcoal/5 transition-colors text-charcoal/40 hover:text-charcoal"
-                  >
-                    <Lock size={20} />
-                  </button>
+                {!isLocked && (
+                  <>
+                    <button 
+                      onClick={() => !isLocked && setIsSettingsOpen(true)}
+                      className="p-3 rounded-full hover:bg-charcoal/5 transition-colors text-charcoal/40 hover:text-charcoal"
+                    >
+                      <Settings size={20} />
+                    </button>
+                    {vaultPassword && (
+                      <button 
+                        onClick={() => {
+                          setIsLocked(true);
+                          setIsSettingsOpen(false);
+                        }}
+                        className="p-3 rounded-full hover:bg-charcoal/5 transition-colors text-charcoal/40 hover:text-charcoal"
+                      >
+                        <Lock size={20} />
+                      </button>
+                    )}
+                  </>
                 )}
               </div>
             </div>
@@ -664,7 +674,7 @@ export default function App() {
 
             {/* Settings Modal */}
             <AnimatePresence>
-              {isSettingsOpen && (
+              {isSettingsOpen && !isLocked && (
                 <motion.div 
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
